@@ -10,11 +10,11 @@ The NTDS.dit file is a file created and used by AD for information including use
 #### Method 1
 ***Note: This analysis is done on an image of a domain controller and is not performed on a live system***
 
-<img src="https://github.com/TheIceRoot/theiceroot.github.io/blob/main/images/ResearchImages/ADPasswordCracking/Figure%201.png" width="auto" height="auto"><br>
+<img src="https://github.com/TheIceRoot/theiceroot.github.io/blob/main/images/ResearchImages/ADPasswordCracking/Figure%201.png" alt="Figure 1" width="auto" height="auto"><br>
 
 The analyst loaded the DC image into Autopsy and was able to extract the SYSTEM hive (%SYSTEMROOT%\Windows\System32\Config\) by right-clicking the file and choosing the option "Extract File(s)".
 
-<img src="https://github.com/TheIceRoot/theiceroot.github.io/blob/main/images/ResearchImages/ADPasswordCracking/Figure%202.png" width="auto" height="auto"><br>
+<img src="https://github.com/TheIceRoot/theiceroot.github.io/blob/main/images/ResearchImages/ADPasswordCracking/Figure%202.png" alt="Figure 2" width="auto" height="auto"><br>
 
 Similarly, the analyst extracted the NTDS.dit file (%SYSTEMROOT%\Windows\NTDS\) from the DC image in Autopsy.
 
@@ -26,7 +26,7 @@ cd impacket/
 
 The analyst installed "impacket" from a git repository which was the key tool in scraping the NTDS.dit file for NTLM ("Windows" New Technology LAN Manager) passwords. The analyst then changed into the impacket directory to run the python scripts that were imported.
 
-<img src="https://github.com/TheIceRoot/theiceroot.github.io/blob/main/images/ResearchImages/ADPasswordCracking/Figure%203.png" width="auto" height="auto"><br>
+<img src="https://github.com/TheIceRoot/theiceroot.github.io/blob/main/images/ResearchImages/ADPasswordCracking/Figure%203.png" alt="Figure 3" width="auto" height="auto"><br>
 
 Using "secretdump.py", the analyst was able to use the NTDS.dit file and the private key from the SYSTEM hive to scrape AD credentials (as seen in Figure 3).
 
@@ -36,11 +36,11 @@ cat hashes.ntds | cut -d : -f 4 |sort|uniq > JustTheHashes.txt
 
 Before decoding the NTLM password, the analyst removed everything except the NTLM hash value and only recorded unique hashes. The command seen above should do the trick.
 
-<img src="https://github.com/TheIceRoot/theiceroot.github.io/blob/main/images/ResearchImages/ADPasswordCracking/Figure%204.png" width="auto" height="auto"><br>
+<img src="https://github.com/TheIceRoot/theiceroot.github.io/blob/main/images/ResearchImages/ADPasswordCracking/Figure%204.png" alt="Figure 4" width="auto" height="auto"><br>
 
 The analyst was finally left will all of the unique hashes of AD users. Now... time to get crackin'.
 
-<img src="https://github.com/TheIceRoot/theiceroot.github.io/blob/main/images/ResearchImages/ADPasswordCracking/Figure%205.png" width="auto" height="auto"><br>
+<img src="https://github.com/TheIceRoot/theiceroot.github.io/blob/main/images/ResearchImages/ADPasswordCracking/Figure%205.png" alt="Figure 5" width="auto" height="auto"><br>
 
 Thankfully NTLM hashes aren't too hard to crack, especially when you can use an online cracker such as "CrackStation" (https://crackstation.net/). Finally, the analyst was left with the passwords for most of the AD users.
 
