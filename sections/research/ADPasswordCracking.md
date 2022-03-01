@@ -18,11 +18,11 @@ The analyst loaded the DC image into Autopsy and was able to extract the SYSTEM 
 
 Similarly, the analyst extracted the NTDS.dit file (%SYSTEMROOT%\Windows\NTDS\) from the DC image in Autopsy.
 
-'''
+```
 git clone https://github/SecureAuthCorp/impacket.git
 
 cd impacket/
-'''
+```
 
 The analyst installed "impacket" from a git repository which was the key tool in scraping the NTDS.dit file for NTLM ("Windows" New Technology LAN Manager) passwords. The analyst then changed into the impacket directory to run the python scripts that were imported.
 
@@ -30,9 +30,9 @@ The analyst installed "impacket" from a git repository which was the key tool in
 
 Using "secretdump.py", the analyst was able to use the NTDS.dit file and the private key from the SYSTEM hive to scrape AD credentials (as seen in Figure 3).
 
-'''
+```
 cat hashes.ntds | cut -d : -f 4 |sort|uniq > JustTheHashes.txt
-'''
+```
 
 Before decoding the NTLM password, the analyst removed everything except the NTLM hash value and only recorded unique hashes. The command seen above should do the trick.
 
@@ -47,27 +47,27 @@ Thankfully NTLM hashes aren't too hard to crack, especially when you can use an 
 ###### Method 2
 There are more than two methods of cracking AD passwords using the NTDS.dit file, but for the sake of this write up, I will only go over two methods. (Will update in the future!)
 
-'''
+```
 PS: Install-Module -Name DSInternals -Force
-'''
+```
 
 To utilize PowerShell to scrape for AD user credentials, the analyst installed the DSInternals zip file (https://www.dsinternals.com/en/downloads/) and ran the command seen above to add the DSInternals DLLs to their machine. The reason for the '-Force' flag is because Windows does not like to add random DLLs to the machine. **Note**: PowerShell must be opened using administrative privileges for this to work.
 
-'''
+```
 PS: Get-BootKey -SystemHivePath [Path]
-'''
+```
 
 The analyst then used the "Get-BootKey" command in PowerShell to pull the private key from the SYSTEM hive. [Path] will be replaced with the path to the SYSTEM hive (which was copied in previous steps in Autopsy). 
 
-'''
+```
 PS: $key = Get-BootKey -SystemHivePath [Path]
-'''
+```
 
 Once the private key was successfully pulled from the SYSTEM hive, the analyst created a variable in PowerShell to call the private key. **Note**: In a perfect situation, the private key will pull from the SYSTEM hive file. If the SYSTEM hive is corrupted or "dirty", use esentutl to clean the database.
 
-'''
+```
 PS: Get-ADDBAccount -All DBPath [Path] -BootKey $key
-'''
+```
 
 Using the "Get-ADDBAccount" command, the analyst was able to pull all AD credentials from the NTDS.dit file. [Path] will be replaced with the path to the NTDS.dit file. Once the credentials have been listed, the analyst used "CrackStation", an online NTLM password cracking tool, to crack the AD user passwords.
 
